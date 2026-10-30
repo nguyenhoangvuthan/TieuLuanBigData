@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 960" role="img" aria-labelledby="title desc">
 <title id="title">Retail recommendation: approved Medallion, Star Schema and GPU ALS architecture</title>
-<desc id="desc">PySpark ingests events and products into Bronze Delta on MinIO. Silver cleans events and products. The Gold Star Schema warehouse feeds dashboards and the temporal ML mart. Spark SQL serves dashboards; GPU Implicit ALS and Popularity produce Top-10 recommendations and evaluation. Versioned artifacts support reproducibility.</desc>
+<desc id="desc">PySpark ingests events and products into Bronze Delta on MinIO. Silver cleans events and products. The Gold Star Schema warehouse feeds dashboards and the temporal ML mart. Spark SQL serves dashboards; GPU Implicit ALS, Popularity and RepeatPop produce Top-10 recommendations and evaluation. Versioned artifacts support reproducibility.</desc>
 <defs>
   <marker id="arr" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L12,6 L0,12 Z" fill="#64748b"/></marker>
   <style>
@@ -44,10 +44,11 @@
 <rect x="60" y="615" width="360" height="80" class="node" fill="#f0fdfa" stroke="#0d9488"/>
 <text class="txt" text-anchor="middle" x="240" y="645">Spark SQL</text>
 <text class="small" text-anchor="middle" x="240" y="675">EDA + Gold dashboards</text>
-<rect x="680" y="615" width="360" height="80" class="node" fill="#eff6ff" stroke="#3b82f6"/>
-<text class="txt" text-anchor="middle" x="860" y="645">GPU Implicit ALS (CuPy / CUDA)</text>
-<text class="small" text-anchor="middle" x="860" y="675">Popularity baseline + fallback</text>
-<path class="arrow" d="M860 695 V730"/>
+<rect x="680" y="615" width="360" height="95" class="node" fill="#eff6ff" stroke="#3b82f6"/>
+<text class="txt" text-anchor="middle" x="860" y="643">GPU Implicit ALS (CuPy / CUDA)</text>
+<text class="small" text-anchor="middle" x="860" y="668">Popularity baseline + fallback</text>
+<text class="small" text-anchor="middle" x="860" y="692">RepeatPop: repeat-purchase baseline</text>
+<path class="arrow" d="M860 710 V730"/>
 <rect x="680" y="735" width="360" height="70" class="node" fill="#f0fdfa" stroke="#0d9488"/>
 <text class="txt" text-anchor="middle" x="860" y="764">Top-10 + Evaluation</text>
 <text class="small" text-anchor="middle" x="860" y="790">Recall@10 | NDCG@10 | Coverage</text>
