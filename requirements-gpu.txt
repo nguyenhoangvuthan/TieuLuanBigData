@@ -1,0 +1,9 @@
+-r requirements-notebook.txt
+# CUDA ALS + bounded GPU scoring; tested on Python 3.14 / RTX 4050.
+cupy-cuda13x==14.2.0
+scipy==1.18.1
+# Minimal CUDA components for ALS/GEMM/NVRTC; no system-wide toolkit required.
+nvidia-cuda-runtime==13.2.86
+nvidia-cuda-nvrtc==13.2.86
+nvidia-cublas==13.4.1.3
+nvidia-curand==10.4.4.72
