@@ -11,7 +11,7 @@ Notebook `tieu_luan_retail_als.ipynb` vừa là bài tiểu luận vừa là pip
 ```text
 T-ECD Small Retail (Parquet)
   → Bronze Delta → Silver Delta → Gold DWH (Star Schema) → Gold aggregates → Spark SQL / dashboard
-                                        └→ Gold ML mart (split thời gian, rút gọn cặp) → GPU Implicit ALS + Popularity
+                                        └→ Gold ML mart (split thời gian, rút gọn cặp) → GPU Implicit ALS + Popularity + RepeatPop
                                                                                       → E2, E1, gold.recommendations
 ```
 
@@ -39,7 +39,7 @@ và SQL; ALS và chấm Top-10 chạy trên NVIDIA CUDA bằng CuPy (`tools/cuda
 
 | File | Vai trò |
 |---|---|
-| `tieu_luan_retail_als.ipynb` | Bài tiểu luận + toàn bộ pipeline (93 cell) |
+| `tieu_luan_retail_als.ipynb` | Bài tiểu luận + toàn bộ pipeline (99 cell) |
 | `run_notebook.sh` | Chạy từ terminal: giới hạn RAM/swap, MinIO, log, resume, `status`, `log` |
 | `de_cuong_tieu_luan.md` | Đề cương để hoàn thiện notebook thành bài tiểu luận |
 | `architecture.svg` | Sơ đồ kiến trúc (phần 2 notebook) |
@@ -120,7 +120,7 @@ Thời gian đo trên cohort nhỏ (7,9 triệu sự kiện): khoảng 25 phút,
 
 - `results/<RUN_ID>/checkpoint/state.json`, ghi nguyên tử (file tạm → fsync → rename → fsync thư mục).
 - Stage theo thứ tự: `source_survey`, `bronze`, `delta_checks`, `silver`, `warehouse`, `gold_aggregates`,
-  `ml_split`, `ml_mart`, `popularity_validation`, `e2`, `e1`, `publish`. Stage `done` được bỏ qua khi chạy lại.
+  `ml_split`, `ml_mart`, `popularity_validation`, `e2`, `e1`, `publish`, `repeat_baseline`. Stage `done` được bỏ qua khi chạy lại.
 - Tiến độ trong stage: từng ngày Bronze, từng bảng Gold/ML, từng cấu hình E2, từng giao thức/mô hình E1.
 - Delta đọc theo version đã ghim trong checkpoint (`read_delta`), không đọc bản mới nhất.
 - Giá trị ghi một lần (`lock_value`): `manifest`, `protocol`, `selection`.
@@ -215,6 +215,7 @@ Kiểm tra: khóa và khóa tự nhiên của mỗi dimension duy nhất; số d
 
 **Kết quả**: `results.validation_popularity_recs`, `results.e2_recs_<config>`, `results.e2_validation`,
 `results.e1_<protocol>_<model>_recs`, `results.e1_cold_start_popularity_recs`, `results.e1_test`,
+`results.validation_repeatpop_recs`, `results.e1_main_repurchase_repeatpop_recs`, `results.repeat_baseline`,
 `gold.recommendations`, `results.model_registry`, `results.model_coverage`, `results.run_performance`.
 Artifact: `results/<RUN_ID>/artifacts/<model_version>/` gồm `model/`, `user_index.parquet`,
 `item_index.parquet`, `manifest.json`; `model_version = <RUN_ID>.<config_id>.<protocol_sha[:8]>`.
@@ -247,6 +248,11 @@ Top-10 theo tile 64 user × 8192 item; hòa điểm xếp `item_index` tăng d�
 
 **Popularity**: điểm = số sự kiện `order` trong lịch sử; hòa điểm theo `item_index`.
 
+**RepeatPop** (stage `repeat_baseline`, mục 11.6, thêm sau khi đã biết E1): item user đã `order` trước cutoff, xếp
+số order ↓ → tổng sự kiện của cặp ↓ → `item_index` ↑, tối đa 10; chỗ còn lại lấp Popularity cùng lịch sử (score 0).
+Không có tham số; định nghĩa khóa bằng `lock_value('repeat_baseline')` trước test. Chỉ giao thức chính, vì ở
+`novel_items` RepeatPop trùng Popularity theo định nghĩa. Không đổi E2/E1/`gold.recommendations`.
+
 **E2**: fit 16 cấu hình trên train, chọn theo NDCG@10 validation (giao thức chính), hòa → Recall@10 → `config_id`.
 **E1**: refit một lần trên lịch sử refit với cấu hình đã khóa; đánh giá test theo giao thức chính
 (`main_repurchase`) và phụ (`novel_items`, loại item đã thấy theo lịch sử refit đầy đủ, gồm cả cặp bị rút gọn);
@@ -271,7 +277,7 @@ trong hạn mức; ghi nhận, không coi là lỗi.
 2. `tools/check_gpu.py` in `ALL_GPU_CHECKS_PASSED` khi sửa `tools/gpu_als.py` hoặc `tools/cuda_als.py`.
 3. Thay đổi pipeline: chạy cohort với RUN_ID riêng, ví dụ
    `./run_notebook.sh --source small --run-id retail_star_<việc>_check`, đến `NOTEBOOK_ALL_CELLS_PASSED`.
-   Chạy lại cùng lệnh phải `STAGE_SKIP` đủ 12 stage.
+   Chạy lại cùng lệnh phải `STAGE_SKIP` đủ 13 stage.
 4. Dọn lượt chạy thử (không chạm RUN_ID thật):
 
 ```bash

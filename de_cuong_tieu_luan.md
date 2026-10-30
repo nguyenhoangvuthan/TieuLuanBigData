@@ -115,6 +115,10 @@ Backend CUDA giải từng bước bằng conjugate gradient với regularizatio
 Điểm của item là số sự kiện `order` trong lịch sử được phép dùng; hòa điểm xếp theo index item. Dùng cùng
 user, nhãn và quy tắc ứng viên như ALS; đồng thời là gợi ý cho user không có lịch sử.
 
+**RepeatPop** (bổ sung sau E1, mục 11.6 notebook): gợi ý lại item user đã `order` trước cutoff, xếp theo số
+order, chỗ còn lại lấp bằng Popularity. Không có tham số; chỉ đánh giá ở giao thức chính, vì ở giao thức item
+mới nó trùng Popularity. Dùng để đo phần đóng góp của mua lặp.
+
 ## 6. Câu hỏi nghiên cứu
 
 - **RQ1:** Implicit ALS có cho kết quả gợi ý tốt hơn Popularity Baseline không?
@@ -167,7 +171,7 @@ gì và vì sao; mỗi code cell làm một việc; output giới hạn số dò
 | **8. Gold ML Data Mart** | Giao thức, chia thời gian, rút gọn, EDA train | Nhãn, bảng cặp, bảng ngưỡng rút gọn, index, strength, popularity; population |
 | **9. Popularity Baseline** | Định nghĩa điểm, hàm chỉ số | Ví dụ kiểm tra hàm chỉ số; Popularity trên validation |
 | **10. ALS — E2** | Lưới tham số, tiêu chí chọn | 16 cấu hình; bảng, biểu đồ; khóa lựa chọn |
-| **11. Đánh giá cuối — E1** | Refit, hai giao thức, cold-start | Bảng/biểu đồ E1; ví dụ Top-10; phát hành `gold.recommendations` và artifact |
+| **11. Đánh giá cuối — E1** | Refit, hai giao thức, cold-start | Bảng/biểu đồ E1; ví dụ Top-10; phát hành `gold.recommendations` và artifact; RepeatPop và bootstrap |
 | **12. Hiệu năng lượt chạy toàn bộ Retail** | Cách đo, giới hạn của một lần đo | Bảng và biểu đồ theo giai đoạn; ảnh Spark UI |
 | **13. Thảo luận và kết luận** | Trả lời RQ1–RQ3, giới hạn, hướng phát triển | Bảng tổng hợp từ kết quả đã lưu |
 | **14. Tài liệu tham khảo và tái lập** | Nguồn, tài liệu đi kèm, quy trình tái lập, đầu ra | Trạng thái các giai đoạn, hồ sơ chạy |
